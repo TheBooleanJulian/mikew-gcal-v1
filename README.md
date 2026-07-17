@@ -1,101 +1,113 @@
+<div align="center">
+
 # Mikew's Performance Schedule Tracker
 
-This project automatically scrapes performance information for Mikew (FattKew The OneBoyBand) from the NAC Busking website and integrates with Google Calendar and Telegram.
+**Automatically scrapes Mikew's busking schedule and syncs it to Google Calendar with Telegram notifications.**
+
+![Python](https://img.shields.io/badge/-Python-3776AB?logo=python&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-00D4C8.svg)
+
+</div>
+
+---
+
+## What it does
+
+Scrapes performance listings for Mikew (FattKew The OneBoyBand) from the NAC Busking website and keeps a Google Calendar up to date automatically. New or changed performances trigger a Telegram channel notification, and the whole cycle repeats on a configurable daily schedule — so anyone following the channel always knows where Mikew is performing next without manual updates.
 
 ## Features
-- Daily scraping of performance schedule
-- Automatic updates to Google Calendar
-- Notifications posted to Telegram channel
-- Scheduled daily refresh
 
-## Prerequisites
+- Daily scraping of the NAC Busking performance schedule
+- Automatic creation/update of events in Google Calendar
+- Telegram channel notifications for new performances
+- Persistent local storage of scraped data and scrape history
+- One-shot (`--once`) and continuous scheduling modes
+- Integration test flags for Telegram and Calendar without a full run
 
-- Python 3.7 or higher
-- A Google account for Google Calendar integration
-- A Telegram account for Telegram notifications
+## Tech Stack
 
-## Installation
+| Layer | Choice |
+|---|---|
+| Scraper | Python + Requests + BeautifulSoup4 |
+| Calendar | Google Calendar API (google-api-python-client + google-auth) |
+| Bot | python-telegram-bot 20.6 |
+| Scheduling | schedule |
+| Config | python-dotenv |
 
-1. Clone or download this repository
-2. Navigate to the project directory
-3. Run the setup script:
-   ```bash
-   python setup.py
-   ```
-   This will:
-   - Install required Python packages
-   - Create a data directory for storing scraped information
-   - Create a template `.env` configuration file
+## Quick Start
 
-## Configuration
-
-### 1. Google Calendar Setup
-
-Follow the instructions in [docs/google_calendar_setup.md](docs/google_calendar_setup.md) to set up Google Calendar integration.
-
-### 2. Telegram Setup
-
-Follow the instructions in [docs/telegram_setup.md](docs/telegram_setup.md) to set up Telegram notifications.
-
-### 3. Environment Variables
-
-Update the `.env` file with your configuration:
-
-```env
-# Google Calendar Configuration
-GOOGLE_CALENDAR_ID=primary
-GOOGLE_CREDENTIALS_FILE=credentials.json
-GOOGLE_TOKEN_FILE=token.json
-
-# Telegram Configuration
-TELEGRAM_BOT_TOKEN=your_bot_token_here
-TELEGRAM_CHANNEL_ID=your_channel_id_here
-
-# Scheduling
-REFRESH_INTERVAL_HOURS=24
+```bash
+git clone https://github.com/TheBooleanJulian/mikew-gcal-v1
+cd mikew-gcal-v1
+python setup.py          # installs packages, creates data/ and .env template
+cp .env .env.local       # edit with your credentials (see Configuration)
+python src/main.py       # run continuously (daily refresh)
 ```
 
-## Usage
+Run once and exit:
 
-### Run Once
-
-To run the scraper once and exit:
 ```bash
 python src/main.py --once
 ```
 
-### Continuous Operation
+Test integrations without a full scrape run:
 
-To run the scraper continuously with daily refresh:
-```bash
-python src/main.py
-```
-
-### Test Integrations
-
-To test Telegram integration:
 ```bash
 python src/main.py --test-telegram
-```
-
-To test Google Calendar integration:
-```bash
 python src/main.py --test-calendar
 ```
 
-## How It Works
+## Configuration
 
-1. The scraper extracts performance information from the NAC Busking website
-2. New performances are added to Google Calendar
-3. Notifications are sent to the Telegram channel
-4. The process repeats daily according to the configured interval
+| Variable | Required | Description |
+|---|---|---|
+| `GOOGLE_CALENDAR_ID` | Yes | Target calendar ID (e.g. `primary`) |
+| `GOOGLE_CREDENTIALS_FILE` | Yes | Path to Google OAuth credentials JSON |
+| `GOOGLE_TOKEN_FILE` | Yes | Path where the OAuth token is stored after first auth |
+| `TELEGRAM_BOT_TOKEN` | Yes | Bot token from @BotFather |
+| `TELEGRAM_CHANNEL_ID` | Yes | Channel ID to post notifications to |
+| `REFRESH_INTERVAL_HOURS` | No | How often to re-scrape (default: `24`) |
 
-## Data Storage
+Full setup guides:
+- Google Calendar: [`docs/google_calendar_setup.md`](docs/google_calendar_setup.md)
+- Telegram: [`docs/telegram_setup.md`](docs/telegram_setup.md)
 
-- `data/performances.json`: Stores the most recent scraped performance data
-- `data/scrape_history.json`: Tracks scraping history and results
-- `token.json`: Google Calendar API authentication token (created after first authentication)
+## Project Structure
 
-## Troubleshooting
+```
+mikew-gcal-v1/
+|-- src/
+|   `-- main.py
+|-- data/
+|   |-- performances.json
+|   `-- scrape_history.json
+|-- docs/
+|   |-- google_calendar_setup.md
+|   `-- telegram_setup.md
+|-- setup.py
+|-- requirements.txt
+`-- .env
+```
 
-See the troubleshooting sections in the Google Calendar and Telegram setup documents for common issues.
+## Status / Roadmap
+
+- [x] NAC Busking website scraper
+- [x] Google Calendar sync
+- [x] Telegram channel notifications
+- [x] Daily scheduled refresh
+- [ ] Detect cancelled/removed performances and remove Calendar events
+- [ ] Web dashboard for scrape history
+
+## Changelog
+
+- **2026-07-17** — Initial release: scraper, Google Calendar integration, Telegram notifications, scheduling, and setup script.
+
+## License
+
+MIT
+
+---
+
+<div align="center">
+<sub>Built by <a href="https://github.com/TheBooleanJulian">@TheBooleanJulian</a></sub>
+</div>
